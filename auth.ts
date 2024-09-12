@@ -1,7 +1,7 @@
 import NextAuth  from "next-auth";
 import authConfig from "@/auth.config";
 import { PrismaAdapter } from "@auth/prisma-adapter";
-import { getUserById } from "./data/user";
+import { getUserById } from './data/user';
 import { db } from "./lib/db";
 
 
@@ -16,7 +16,7 @@ export const {
 
   pages :{
     signIn : "/auth/login",
-    error : "/auth/login",
+    error : "/auth/error",
     
   },
 
@@ -35,6 +35,24 @@ export const {
     }
   },
   callbacks: {
+
+    async signIn({user, account}){
+      console.log({user, account})
+        if(account?.provider !== "credentials") {
+          return true
+          
+        }
+
+        const existingUser = await getUserById(user.id);
+
+        if(!existingUser?.emailVerified)return false;
+      
+
+        //todo -2FA check
+
+
+        return true
+    },
      
 
 

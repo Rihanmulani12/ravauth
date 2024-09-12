@@ -3,8 +3,11 @@ import { db } from "@/lib/db";
 import bcrypt from "bcryptjs"
 
 import { z } from "zod";
+import { sendVerificationEmail } from "@/lib/mail";
 import { registerSchema } from "@/schemas";
 import { getUserByEmail } from "@/data/user";
+import { generateVerificationToken } from "@/lib/tokens";
+
 
 
 export const register = async (values: z.infer<typeof registerSchema>) => {
@@ -36,11 +39,16 @@ export const register = async (values: z.infer<typeof registerSchema>) => {
     },
   });
 
-  //todo: send email vrification
+  const verificationToken = await generateVerificationToken(email);
+    
+   await sendVerificationEmail(
+    verificationToken.email,
+    verificationToken.token
+   )
   
 
 
   return {
-    success: "User created",
+    success: "Confirmation email sent",
   };
 };
